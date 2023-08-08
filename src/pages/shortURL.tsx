@@ -43,10 +43,9 @@ function ShortURL() {
         maxRows={4}
         minRows={4}
         autoFocus
-        helperText="Enter a long URL to shorten"
         margin="dense"
         placeholder="https://www.example.com/very-long-url"
-        variant="filled"
+        variant="standard"
         value={longURL}
         onChange={handleChange}
         error={!validURL}
