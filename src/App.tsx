@@ -1,23 +1,16 @@
-import { TextField } from "@mui/material";
+import { QueryClient, QueryClientProvider } from "react-query";
 import { Container } from "@mui/material";
+import ShortURL from "./pages/shortURL";
 
 function App() {
+  const queryClient = new QueryClient();
+
   return (
-    <Container maxWidth="md">
-      <TextField
-        fullWidth
-        id="long-url"
-        label="Long URL"
-        multiline
-        maxRows={4}
-        minRows={4}
-        autoFocus
-        helperText="Enter a long URL to shorten"
-        margin="dense"
-        placeholder="https://www.example.com/very-long-url"
-        variant="filled"
-      />
-    </Container>
+    <QueryClientProvider client={queryClient}>
+      <Container maxWidth="md">
+        <ShortURL />
+      </Container>
+    </QueryClientProvider>
   );
 }
 
