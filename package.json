@@ -1,5 +1,6 @@
 {
   "name": "short-url",
+  "homepage": "https://faizanbardai.github.io/su",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
