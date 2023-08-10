@@ -4,18 +4,24 @@ import { useMutation } from "react-query";
 import { useState } from "react";
 import { create } from "../services/shortURL";
 import isValidURL from "../utils/isValidURL";
+import { URL } from "../types";
 
 function ShortURL() {
   const [longURL, setLongURL] = useState<string>("");
-  const [shortURL, setShortURL] = useState<string>("");
+  const [alias, setAlias] = useState<string>("");
+  const [shortURLs, setShortURLs] = useState<URL[]>([]);
   const [validURL, setValidURL] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
 
   const { mutate, isLoading } = useMutation(create, {
     onSuccess: (data) => {
-      setShortURL(data.shortURL);
+      setShortURLs(data);
+      setError("");
+      setAlias("");
+      document.getElementById("alias")?.focus();
     },
-    onError: (error) => {
-      console.log(error);
+    onError: (error: any) => {
+      setError(error.response.data.message || error.message);
     },
   });
 
@@ -24,15 +30,26 @@ function ShortURL() {
     const valid = isValidURL(e.target.value);
     setValidURL(valid);
     if (valid) {
-      mutate(e.target.value);
+      mutate({ longURL: e.target.value, alias });
     }
   };
 
-  const handleCopy = () => {
+  const handleCopy = (shortURL: string) => {
     navigator.clipboard.writeText(
       `${process.env.REACT_APP_BACKEND_URL}${shortURL}`
     );
   };
+
+  const handleChangeAlias = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // replace all non-alphanumeric characters with dash (-)
+    e.target.value = e.target.value.replace(/[^a-zA-Z0-9]/g, "-");
+    setAlias(e.target.value);
+  };
+
+  const handleUpdateAlias = (originalURL: string, alias: string) => {
+    mutate({ longURL: originalURL, alias });
+  };
+
   return (
     <div>
       <TextField
@@ -50,24 +67,52 @@ function ShortURL() {
         onChange={handleChange}
         error={!validURL}
       />
-      {shortURL && (
+      {shortURLs.length > 0 && (
+        <TextField
+          fullWidth
+          id="alias"
+          margin="dense"
+          label="Add Custom Alias"
+          value={alias}
+          onChange={handleChangeAlias}
+          helperText="Only alphanumeric characters and dash (-) are allowed"
+          InputProps={{
+            endAdornment: (
+              <Button
+                variant="text"
+                onClick={() =>
+                  handleUpdateAlias(shortURLs[0].originalURL, alias)
+                }
+                disabled={!alias}
+              >
+                Send
+              </Button>
+            ),
+          }}
+        />
+      )}
+      {shortURLs.map((url) => (
         <Alert
+          key={url._id}
           severity="success"
+          sx={{ mb: 1 }}
           action={
             <Button
               color="inherit"
               size="small"
-              onClick={handleCopy}
-              disabled={!shortURL}
+              onClick={() => handleCopy(url.shortURL)}
+              disabled={!url}
             >
               COPY
             </Button>
           }
         >
-          {shortURL}
+          {url.shortURL}
         </Alert>
-      )}
+      ))}
+
       {isLoading && <LinearProgress />}
+      {error && <Alert severity="error">{error}</Alert>}
     </div>
   );
 }
