@@ -1,23 +1,25 @@
 import { useState, ChangeEvent } from "react";
-import { Alert, Button, LinearProgress, TextField } from "@mui/material";
+import { Alert, Box, Button, LinearProgress, TextField } from "@mui/material";
 import { useMutation } from "react-query";
 import { create } from "../services/shortURL";
 import isValidURL from "../utils/isValidURL";
-import { URL } from "../types";
+import { Document, URL } from "../types";
+import URLData from "../components/shortURL/URLData";
 
 function ShortURL() {
   const [longURL, setLongURL] = useState<string>("");
   const [alias, setAlias] = useState<string>("");
-  const [shortURLs, setShortURLs] = useState<URL[]>([]);
+  const [shortURLs, setShortURLs] = useState<Document[]>([]);
   const [validURL, setValidURL] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
+  const [urlData, setUrlData] = useState<URL>({} as URL);
 
   const { mutate, isLoading } = useMutation(create, {
     onSuccess: (data) => {
-      setShortURLs(data);
+      setShortURLs(data.documents);
+      setUrlData(data.url);
       setError("");
       setAlias("");
-      document.getElementById("alias")?.focus();
     },
     onError: (error: any) => {
       setError(error.response.data.message || error.message);
@@ -49,24 +51,10 @@ function ShortURL() {
     mutate({ longURL: originalURL, alias });
   };
 
-  return (
-    <div>
-      <TextField
-        fullWidth
-        id="long-url"
-        label="Long URL"
-        multiline
-        maxRows={4}
-        minRows={4}
-        autoFocus
-        margin="dense"
-        placeholder="https://www.example.com/very-long-url"
-        variant="standard"
-        value={longURL}
-        onChange={handleChange}
-        error={!validURL}
-      />
-      {shortURLs.length > 0 && (
+  const showData = () => {
+    return (
+      <>
+        {urlData?.host && <URLData urlData={urlData} />}
         <TextField
           fullWidth
           id="alias"
@@ -89,30 +77,61 @@ function ShortURL() {
             ),
           }}
         />
+        {shortURLs.map((urlDocument) => (
+          <ShortURLAlert url={urlDocument} key={urlDocument._id} />
+        ))}
+      </>
+    );
+  };
+
+  const ShortURLAlert = (props: { url: Document }) => {
+    const { url } = props;
+    return (
+      <Alert
+        key={url._id}
+        severity="success"
+        sx={{ mb: 1 }}
+        action={
+          <Button
+            color="inherit"
+            size="small"
+            onClick={() => handleCopy(url.shortURL)}
+            disabled={!url}
+          >
+            COPY
+          </Button>
+        }
+      >
+        {url.shortURL}
+      </Alert>
+    );
+  };
+
+  return (
+    <Box>
+      {shortURLs.length > 0 ? (
+        showData()
+      ) : (
+        <TextField
+          fullWidth
+          id="long-url"
+          label="Long URL"
+          multiline
+          maxRows={4}
+          minRows={4}
+          autoFocus
+          margin="dense"
+          placeholder="https://www.example.com/very-long-url"
+          variant="standard"
+          value={longURL}
+          onChange={handleChange}
+          error={!validURL}
+        />
       )}
-      {shortURLs.map((url) => (
-        <Alert
-          key={url._id}
-          severity="success"
-          sx={{ mb: 1 }}
-          action={
-            <Button
-              color="inherit"
-              size="small"
-              onClick={() => handleCopy(url.shortURL)}
-              disabled={!url}
-            >
-              COPY
-            </Button>
-          }
-        >
-          {url.shortURL}
-        </Alert>
-      ))}
 
       {isLoading && <LinearProgress />}
       {error && <Alert severity="error">{error}</Alert>}
-    </div>
+    </Box>
   );
 }
 
