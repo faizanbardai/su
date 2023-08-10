@@ -1,7 +1,6 @@
-import React from "react";
+import { useState, ChangeEvent } from "react";
 import { Alert, Button, LinearProgress, TextField } from "@mui/material";
 import { useMutation } from "react-query";
-import { useState } from "react";
 import { create } from "../services/shortURL";
 import isValidURL from "../utils/isValidURL";
 import { URL } from "../types";
@@ -25,7 +24,7 @@ function ShortURL() {
     },
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setLongURL(e.target.value);
     const valid = isValidURL(e.target.value);
     setValidURL(valid);
@@ -40,7 +39,7 @@ function ShortURL() {
     );
   };
 
-  const handleChangeAlias = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeAlias = (e: ChangeEvent<HTMLInputElement>) => {
     // replace all non-alphanumeric characters with dash (-)
     e.target.value = e.target.value.replace(/[^a-zA-Z0-9]/g, "-");
     setAlias(e.target.value);
