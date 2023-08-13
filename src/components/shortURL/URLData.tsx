@@ -10,7 +10,7 @@ import {
 import { URL } from "../../types";
 type Props = { urlData: URL };
 export default function URLData({ urlData }: Props) {
-  const { host, ip, pathname, search, hash, protocol, params } = urlData;
+  const { host, ip, pathname, hash, protocol, params } = urlData;
   return (
     <div>
       <TableContainer>
@@ -29,14 +29,6 @@ export default function URLData({ urlData }: Props) {
               <TableCell>
                 <Typography style={{ wordBreak: "break-all" }}>
                   {pathname}
-                </Typography>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>Search</TableCell>
-              <TableCell>
-                <Typography style={{ wordBreak: "break-all" }}>
-                  {search}
                 </Typography>
               </TableCell>
             </TableRow>
