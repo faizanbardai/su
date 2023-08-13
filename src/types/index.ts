@@ -8,11 +8,11 @@ export type URL = {
   host: string;
   port: string;
   pathname: string;
-  search: string;
   hash: string;
   protocol: string;
   params: string;
   ip: string;
+  href: string;
 };
 
 export type createBody = {
@@ -21,6 +21,13 @@ export type createBody = {
 };
 
 export type createResponse = {
+  createdAt: string;
   url: URL;
   documents: Document[];
+};
+
+export type historyData = {
+  url: URL;
+  documents: Document[];
+  createdAt: string;
 };

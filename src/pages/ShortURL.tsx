@@ -1,10 +1,18 @@
 import { useState, ChangeEvent } from "react";
-import { Alert, Box, Button, LinearProgress, TextField } from "@mui/material";
+import {
+  Alert,
+  Container,
+  Button,
+  LinearProgress,
+  TextField,
+} from "@mui/material";
 import { useMutation } from "react-query";
 import { create } from "../services/shortURL";
 import isValidURL from "../utils/isValidURL";
 import { Document, URL } from "../types";
 import URLData from "../components/shortURL/URLData";
+import addToHistory from "../utils/addToHistory";
+import ShortURLAlert from "../components/common/ShortURLAlert";
 
 function ShortURL() {
   const [longURL, setLongURL] = useState<string>("");
@@ -17,6 +25,7 @@ function ShortURL() {
   const { mutate, isLoading } = useMutation(create, {
     onSuccess: (data) => {
       setShortURLs(data.documents);
+      addToHistory(data);
       setUrlData(data.url);
       setError("");
       setAlias("");
@@ -33,12 +42,6 @@ function ShortURL() {
     if (valid) {
       mutate({ longURL: e.target.value, alias });
     }
-  };
-
-  const handleCopy = (shortURL: string) => {
-    navigator.clipboard.writeText(
-      `${process.env.REACT_APP_BACKEND_URL}${shortURL}`
-    );
   };
 
   const handleChangeAlias = (e: ChangeEvent<HTMLInputElement>) => {
@@ -84,31 +87,8 @@ function ShortURL() {
     );
   };
 
-  const ShortURLAlert = (props: { url: Document }) => {
-    const { url } = props;
-    return (
-      <Alert
-        key={url._id}
-        severity="success"
-        sx={{ mb: 1 }}
-        action={
-          <Button
-            color="inherit"
-            size="small"
-            onClick={() => handleCopy(url.shortURL)}
-            disabled={!url}
-          >
-            COPY
-          </Button>
-        }
-      >
-        {url.shortURL}
-      </Alert>
-    );
-  };
-
   return (
-    <Box>
+    <Container maxWidth="sm">
       {shortURLs.length > 0 ? (
         showData()
       ) : (
@@ -131,7 +111,7 @@ function ShortURL() {
 
       {isLoading && <LinearProgress />}
       {error && <Alert severity="error">{error}</Alert>}
-    </Box>
+    </Container>
   );
 }
 
