@@ -24,3 +24,9 @@ export type createResponse = {
   url: URL;
   documents: Document[];
 };
+
+export type historyData = {
+  url: URL;
+  documents: Document[];
+  createdAt?: string;
+};

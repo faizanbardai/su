@@ -5,6 +5,7 @@ import { create } from "../services/shortURL";
 import isValidURL from "../utils/isValidURL";
 import { Document, URL } from "../types";
 import URLData from "../components/shortURL/URLData";
+import addToHistory from "../utils/addToHistory";
 
 function ShortURL() {
   const [longURL, setLongURL] = useState<string>("");
@@ -17,6 +18,7 @@ function ShortURL() {
   const { mutate, isLoading } = useMutation(create, {
     onSuccess: (data) => {
       setShortURLs(data.documents);
+      addToHistory(data);
       setUrlData(data.url);
       setError("");
       setAlias("");
