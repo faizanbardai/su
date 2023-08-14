@@ -1,4 +1,4 @@
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, ClipboardEvent } from "react";
 import {
   Alert,
   Container,
@@ -35,12 +35,25 @@ function ShortURL() {
     },
   });
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setLongURL(e.target.value);
     const valid = isValidURL(e.target.value);
     setValidURL(valid);
+  };
+
+  const handleSubmit = () => {
+    const valid = isValidURL(longURL);
+    setValidURL(valid);
     if (valid) {
-      mutate({ longURL: e.target.value, alias });
+      mutate({ longURL: longURL, alias });
+    }
+  };
+
+  const handlePaste = (e: ClipboardEvent<HTMLDivElement>) => {
+    const text = e.clipboardData.getData("Text");
+    const valid = isValidURL(text);
+    if (valid) {
+      mutate({ longURL: text, alias });
     }
   };
 
@@ -104,8 +117,20 @@ function ShortURL() {
           placeholder="https://www.example.com/very-long-url"
           variant="standard"
           value={longURL}
+          onPaste={handlePaste}
           onChange={handleChange}
           error={!validURL}
+          InputProps={{
+            endAdornment: (
+              <Button
+                variant="text"
+                onClick={handleSubmit}
+                disabled={!validURL}
+              >
+                Send
+              </Button>
+            ),
+          }}
         />
       )}
 
