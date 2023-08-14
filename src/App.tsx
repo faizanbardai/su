@@ -18,7 +18,7 @@ function App() {
   return (
     <HashRouter basename="/">
       <QueryClientProvider client={queryClient}>
-        <Container maxWidth={"sm"}>
+        <Container maxWidth={"sm"} disableGutters>
           <AppBar position="static" sx={{ mb: 2 }}>
             <Toolbar variant="dense">
               <Typography component="div" sx={{ flexGrow: 1 }}>
