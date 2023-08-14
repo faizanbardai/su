@@ -8,7 +8,7 @@ dayjs.extend(relativeTime);
 const SingleHistoryCard = (props: { data: historyData }) => {
   const { url, documents, createdAt } = props.data;
   return (
-    <Card sx={{ mb: 1 }}>
+    <Card sx={{ m: 1 }}>
       <CardContent>
         <Typography
           variant="body2"
